@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mosaic: learn to code one step at a time</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+ --bg:#103B36;--panel:#17504A;--ink:#F3F8F6;--muted:#BAD5CF;--line:#2F7068;--navy:#3A69AB;--teal:#1297B8;--orange:#F4A65E;--on:#0B2420;
+ --editor:#0B2230;--fs:1.15rem;--head:'Fredoka','Trebuchet MS',system-ui,sans-serif;--body:'Atkinson Hyperlegible',Verdana,system-ui,sans-serif;--accent:var(--orange)}
+:root[data-theme="light"]{--bg:#EEF6F4;--panel:#FFFFFF;--ink:#10302C;--muted:#436660;--line:#BCD5CF;--navy:#2A5290;--teal:#0B7F9D;--orange:#E58A2E;--on:#10302C}
+:root[data-text="big"]{--fs:1.35rem}
+:root[data-motion="off"] *{transition:none!important}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:var(--fs)/1.65 var(--body);min-height:100%}
+h1,h2,h3{font-family:var(--head);line-height:1.2;margin:0 0 .5em}
+h1{font-size:clamp(2rem,5vw,3rem)}h2{font-size:1.5rem}
+p{margin:0 0 1em;max-width:60ch}
+:focus-visible{outline:4px solid var(--orange);outline-offset:3px;border-radius:8px}
+button{font:inherit;cursor:pointer}
+.skip{position:absolute;left:-999px;top:8px;background:var(--orange);color:#0B2420;padding:12px 16px;border-radius:10px;z-index:9}.skip:focus{left:8px}
+header{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);border-bottom:3px solid var(--line);z-index:5}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;max-width:1000px;margin:0 auto;padding:10px 20px}
+.logo{display:flex;gap:12px;align-items:center;margin-right:auto;background:none;border:0;color:var(--ink);font:600 1.8rem var(--head);padding:4px;min-height:48px}
+.logo svg{width:44px;height:44px}
+.b{min-height:52px;padding:10px 22px;border-radius:14px;border:3px solid var(--line);background:var(--panel);color:var(--ink);font-weight:700}
+.b:hover{border-color:var(--ink)}
+.b.go{background:var(--orange);border-color:var(--orange);color:#0B2420}
+.b.go:hover{filter:brightness(1.07)}
+.b:disabled{opacity:.45;cursor:default}
+details.set{position:relative}
+details.set summary{list-style:none;min-height:52px;padding:10px 18px;border:3px solid var(--line);border-radius:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;background:var(--panel)}
+details.set summary::-webkit-details-marker{display:none}
+.pop{position:absolute;right:0;top:60px;background:var(--panel);border:3px solid var(--line);border-radius:16px;padding:12px;width:min(280px,86vw);display:grid;gap:8px;z-index:6}
+.pop label{display:flex;gap:12px;align-items:center;min-height:50px;padding:6px 10px;border-radius:10px;background:var(--bg);font-weight:700;cursor:pointer}
+.pop input{width:26px;height:26px;accent-color:var(--orange)}
+.page{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
+[hidden]{display:none!important}
+.order{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 28px;padding:0;list-style:none}
+.order li{background:var(--panel);border:3px solid var(--line);border-radius:999px;padding:6px 18px;font-weight:700}
+.cards{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.course{text-align:left;background:var(--panel);border:4px solid var(--line);border-radius:22px;padding:22px;color:var(--ink);display:grid;gap:10px;align-content:start}
+.course:hover:not(:disabled){border-color:var(--c)}
+.course:disabled{opacity:.6;cursor:default}
+.course h2{margin:0}.course p{margin:0;color:var(--muted)}
+.tiles{display:flex;gap:8px}
+.tile{width:36px;height:36px;border-radius:9px;border:3px solid var(--c,var(--line));background:transparent}
+.tile.on{background:var(--c)}
+.tag{font-weight:700;color:var(--c)}
+.lesson-head{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:8px}
+.crumb{color:var(--muted);font-weight:700;margin:0}
+.panel{background:var(--panel);border:3px solid var(--line);border-radius:22px;padding:24px;margin-bottom:20px}
+.panel.big{border-top:10px solid var(--accent)}
+.tip{background:var(--bg);border-left:8px solid var(--accent);padding:12px 16px;border-radius:10px}
+.cols{display:grid;gap:18px;grid-template-columns:1fr}
+@media(min-width:960px){.cols.two{grid-template-columns:1fr 1fr}}
+.pane{background:var(--panel);border:3px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+.pane h3{margin:0;padding:10px 16px;font-size:1.1rem;border-bottom:3px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+textarea{width:100%;min-height:260px;resize:vertical;border:0;background:var(--editor);color:#E8F2F5;font:1rem/1.6 ui-monospace,Menlo,Consolas,monospace;padding:14px}
+iframe{width:100%;min-height:240px;flex:1;border:0;background:#fff}
+.actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
+.steps{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.steps span{padding:6px 16px;border-radius:999px;border:3px solid var(--line);font-weight:700;color:var(--muted)}
+.steps span[aria-current="step"]{background:var(--accent);border-color:var(--accent);color:#0B2420}
+dialog{border:4px solid var(--teal);border-radius:24px;background:var(--panel);color:var(--ink);padding:32px;max-width:420px;text-align:center}
+dialog::backdrop{background:rgba(5,20,18,.8)}
+.orb{width:110px;height:110px;border-radius:50%;background:var(--teal);margin:12px auto 20px;transition:transform 4s ease-in-out}
+.orb.in{transform:scale(1.5)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header><div class="bar">
+ <button class="logo" id="home" type="button" aria-label="Mosaic, go to start">
+  <svg viewBox="0 0 60 60" aria-hidden="true"><g id="lg"></g></svg>Mosaic
+ </button>
+ <button class="b" id="breakBtn" type="button">Take a break</button>
+ <details class="set"><summary>Settings</summary><div class="pop">
+  <label><input type="checkbox" data-set="theme"> Light mode</label>
+  <label><input type="checkbox" data-set="text"> Bigger text</label>
+  <label><input type="checkbox" data-set="motion"> No movement</label>
+ </div></details>
+</div></header>
+
+<main id="main" class="page" tabindex="-1">
+ <section id="start">
+  <h1>What do you want to learn?</h1>
+  <p>Pick one. Every lesson has the same three parts, in the same order.</p>
+  <ol class="order"><li>1 Look</li><li>2 Try</li><li>3 Done</li></ol>
+  <div class="cards" id="cards"></div>
+ </section>
+
+ <section id="lessonView" hidden>
+  <div class="lesson-head">
+   <p class="crumb" id="crumb"></p>
+   <button class="b" id="toStart" type="button">All courses</button>
+  </div>
+  <div class="tiles" id="lessonTiles" aria-label="Lessons in this course" style="margin-bottom:18px"></div>
+  <div class="steps" id="steps" aria-label="Parts of this lesson"><span>1 Look</span><span>2 Try</span><span>3 Done</span></div>
+
+  <div id="phase0">
+   <div class="panel big"><h1 id="title"></h1><div id="text"></div></div>
+   <div class="pane" style="margin-bottom:20px"><h3>This is what you will make</h3><iframe id="demo" title="Example result" sandbox="allow-scripts"></iframe></div>
+  </div>
+  <div id="phase1" hidden>
+   <div class="panel"><p style="margin:0" id="tryTip"></p></div>
+   <div class="cols two">
+    <div class="pane"><h3><label for="code">Your code</label><button class="b" style="min-height:42px;padding:4px 14px" id="reset" type="button">Put code back</button></h3><textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea></div>
+    <div class="pane"><h3>What your code makes</h3><iframe id="out" title="Result of your code" sandbox="allow-scripts"></iframe></div>
+   </div>
+   <p style="margin:12px 0 0;color:var(--muted)">You cannot break anything. Press Run to see changes.</p>
+  </div>
+  <div id="phase2" hidden>
+   <div class="panel big"><h1>You finished this lesson.</h1><p id="doneMsg"></p></div>
+  </div>
+
+  <div class="actions" style="margin-top:20px">
+   <button class="b" id="back" type="button">Back</button>
+   <div style="display:flex;gap:12px;flex-wrap:wrap"><button class="b" id="run" type="button" hidden>Run my code</button><button class="b go" id="primary" type="button"></button></div>
+  </div>
+ </section>
+</main>
+
+<dialog id="brk" aria-labelledby="brkT">
+ <h2 id="brkT">Take your time.</h2>
+ <div class="orb" id="orb" aria-hidden="true"></div>
+ <p id="brkTxt">Breathe in slowly. Breathe out slowly. Stay as long as you like.</p>
+ <button class="b go" id="brkClose" type="button">I am ready to go back</button>
+</dialog>
+
+<script>
+const $=s=>document.querySelector(s),root=document.documentElement,SC="<\/script>";
+// logo: 3x3 tiles, same pattern as the Mosaic logo
+const P=["n","t","o","t","o","n","o","n","t"],CL={n:"#2B4F7E",t:"#1297B8",o:"#F4A65E"};
+$("#lg").innerHTML=P.map((k,i)=>`<rect x="${(i%3)*20}" y="${Math.floor(i/3)*20}" width="17" height="17" rx="4" fill="${CL[k]}"/>`).join("");
+const COURSES={
+html:{name:"HTML",d:"Put words and lists on a web page.",c:"--orange",L:[
+ {t:"What is HTML?",x:"<p>HTML puts things on a web page.</p><p>Words in angle brackets are called <b>tags</b>. Tags tell the page what to show.</p>",tip:"Change the words between the tags. Then press Run.",c:"<h1>Hello!</h1>\n<p>This is my first web page.</p>"},
+ {t:"Headings and paragraphs",x:"<p><b>h1</b> makes a big heading. <b>h2</b> makes a smaller one.</p><p><b>p</b> makes a paragraph.</p>",tip:"Write about your own favorite animal.",c:"<h1>My favorite animal</h1>\n<h2>The octopus</h2>\n<p>It has eight arms.</p>\n<p>It can change color.</p>"},
+ {t:"Lists",x:"<p><b>ul</b> makes a list with dots. Each item uses <b>li</b>.</p>",tip:"Add one more li line to the list.",c:"<h2>Things I like</h2>\n<ul>\n  <li>Trains</li>\n  <li>Drawing</li>\n  <li>Puzzles</li>\n</ul>"}]},
+css:{name:"CSS",d:"Change colors, size and space.",c:"--teal",L:[
+ {t:"What is CSS?",x:"<p>CSS changes how a page looks.</p><p>A CSS rule says <b>what to change</b> and <b>how to change it</b>.</p>",tip:"Change the word blue to red.",c:"<style>\n  p { color: blue; }\n</style>\n<p>This text is blue.</p>\n<p>So is this one.</p>"},
+ {t:"Colors and backgrounds",x:"<p><b>color</b> changes the text color. <b>background</b> changes what is behind the text.</p>",tip:"Try green, purple or orange.",c:"<style>\n  h1 {\n    color: white;\n    background: purple;\n  }\n</style>\n<h1>Purple banner</h1>"},
+ {t:"Size and space",x:"<p><b>padding</b> adds space inside a box. <b>font-size</b> changes how big letters are.</p>",tip:"Make the padding bigger.",c:"<style>\n  p {\n    background: lightyellow;\n    padding: 20px;\n    font-size: 24px;\n  }\n</style>\n<p>A roomy box of text.</p>"}]},
+js:{name:"JavaScript",d:"Make a page do things.",c:"--navy",L:[
+ {t:"What is JavaScript?",x:"<p>JavaScript tells a page what to do. It reads your lines from top to bottom.</p><p><b>console.log</b> writes a message.</p>",tip:"Change the message in the quotes.",c:"<script>\nconsole.log(\"Hello!\");\nconsole.log(\"I am learning JavaScript.\");\n"+SC},
+ {t:"Variables",x:"<p>A <b>variable</b> is a box with a name. It keeps a value so you can use it again.</p>",tip:"Change the name and the number.",c:"<script>\nlet name = \"Sam\";\nlet age = 9;\nconsole.log(\"My name is \" + name);\nconsole.log(\"I am \" + age + \" years old.\");\n"+SC},
+ {t:"Buttons",x:"<p>A page can wait for a click. Then it runs your code. A click is called an <b>event</b>.</p>",tip:"Change what the message says after the click.",c:"<button id=\"b\">Click me</button>\n<p id=\"msg\">Nothing yet.</p>\n<script>\ndocument.getElementById(\"b\").onclick = function () {\n  document.getElementById(\"msg\").textContent = \"You clicked!\";\n};\n"+SC}]}
+};
+let cur="html",idx=0,ph=0,prog={};
+try{prog=JSON.parse(localStorage.getItem("mosaic-prog")||"{}")}catch(e){}
+const done=(c,i)=>!!prog[c+i],save=()=>{try{localStorage.setItem("mosaic-prog",JSON.stringify(prog))}catch(e){}};
+const tilesHTML=(k,cls)=>COURSES[k].L.map((_,i)=>`<span class="tile${done(k,i)?' on':''}" ></span>`).join("");
+function cards(){const w=$("#cards");w.innerHTML="";
+ Object.entries(COURSES).forEach(([k,v])=>{const b=document.createElement("button");b.className="course";b.type="button";b.style.setProperty("--c",`var(${v.c})`);
+  const n=v.L.filter((_,i)=>done(k,i)).length;
+  b.innerHTML=`<h2>${v.name}</h2><p>${v.d}</p><div class="tiles">${tilesHTML(k)}</div><span class="tag">${n} of ${v.L.length} finished</span>`;
+  b.onclick=()=>{cur=k;idx=Math.max(0,v.L.findIndex((_,i)=>!done(k,i)));ph=0;show()};w.appendChild(b)});
+ const s=document.createElement("button");s.className="course";s.disabled=true;s.innerHTML="<h2>Python</h2><p>Coming soon.</p>";w.appendChild(s)}
+const pre="<script>(function(){var l=document.createElement('pre');l.style.cssText='background:#eef3f6;color:#10302C;padding:8px 12px;margin:12px 0 0;font:15px/1.5 monospace;border-radius:8px;display:none';window.addEventListener('DOMContentLoaded',function(){document.body.appendChild(l)});console.log=function(){l.style.display='block';l.textContent+=[].slice.call(arguments).join(' ')+'\\n'};window.onerror=function(m){console.log('Oops: '+m)}})();"+SC;
+const doc=c=>"<!DOCTYPE html><meta charset=utf-8><body style='font-family:sans-serif;margin:14px'>"+pre+c;
+function show(){const C=COURSES[cur],L=C.L[idx];root.style.setProperty("--accent",`var(${C.c})`);
+ $("#start").hidden=ph<0;$("#lessonView").hidden=ph<0?true:false;
+ if(ph<0){cards();$("#start").hidden=false;return}
+ $("#start").hidden=true;
+ $("#crumb").textContent=C.name+", lesson "+(idx+1)+" of "+C.L.length;
+ $("#lessonTiles").style.setProperty("--c",`var(${C.c})`);$("#lessonTiles").innerHTML=tilesHTML(cur);
+ [...$("#steps").children].forEach((s,i)=>i==ph?s.setAttribute("aria-current","step"):s.removeAttribute("aria-current"));
+ [0,1,2].forEach(i=>$("#phase"+i).hidden=i!=ph);
+ $("#title").textContent=L.t;$("#text").innerHTML=L.x;$("#tryTip").textContent=L.tip;
+ $("#run").hidden=ph!=1;
+ $("#back").textContent=ph==0?"Back to courses":"Back";
+ const last=idx==C.L.length-1;
+ $("#primary").textContent=ph==0?"Next: try it":ph==1?"I am done":(last?"Back to courses":"Next lesson");
+ if(ph==0){$("#demo").srcdoc=doc(L.c)}
+ if(ph==1){$("#code").value=L.c;$("#out").srcdoc=doc(L.c)}
+ if(ph==2){$("#doneMsg").textContent=last?"That was the last lesson in "+C.name+".":"Next up: "+C.L[idx+1].t+"."}
+ $("#main").focus();window.scrollTo(0,0)}
+function go(){ph=-1;show()}
+$("#home").onclick=$("#toStart").onclick=go;
+$("#back").onclick=()=>{ph==0?go():(ph--,show())};
+$("#primary").onclick=()=>{const C=COURSES[cur];
+ if(ph==0){ph=1;show()}else if(ph==1){prog[cur+idx]=true;save();ph=2;show()}
+ else{if(idx<C.L.length-1){idx++;ph=0;show()}else go()}};
+$("#run").onclick=()=>{$("#out").srcdoc=doc($("#code").value)};
+$("#reset").onclick=()=>{$("#code").value=COURSES[cur].L[idx].c;$("#out").srcdoc=doc($("#code").value)};
+// break dialog
+let tm;const brk=$("#brk"),orb=$("#orb");
+function cyc(){orb.classList.toggle("in")}
+$("#breakBtn").onclick=()=>{brk.showModal();orb.classList.remove("in");setTimeout(cyc,50);tm=setInterval(cyc,4500)};
+$("#brkClose").onclick=()=>brk.close();brk.addEventListener("close",()=>clearInterval(tm));
+// settings
+let sv={};try{sv=JSON.parse(localStorage.getItem("mosaic-set")||"{}")}catch(e){}
+const A={theme:["data-theme","light"],text:["data-text","big"],motion:["data-motion","off"]};
+document.querySelectorAll("[data-set]").forEach(c=>{const k=c.dataset.set,f=()=>{const[a,v]=A[k];c.checked?root.setAttribute(a,v):root.removeAttribute(a);sv[k]=c.checked;try{localStorage.setItem("mosaic-set",JSON.stringify(sv))}catch(e){}};if(sv[k]){c.checked=true;f()}c.onchange=f});
+go();
+</script>
+</body>
+</html>
